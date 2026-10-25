@@ -106,7 +106,7 @@ Exact values shift slightly with library versions; `python train_model.py` write
 
 ## Quick start: run the dashboard
 
-Needs Python 3.9 or newer. The trained model and sample data are included, and TensorFlow is **not** needed.
+Tested on Python 3.11 and 3.12. The trained model and sample data are included, and TensorFlow is **not** needed.
 
 ```bash
 git clone https://github.com/<your-username>/electricity-optimizer.git
