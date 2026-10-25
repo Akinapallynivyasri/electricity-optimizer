@@ -1,0 +1,26 @@
+{
+  "mae_kwh": 1.1471174811226978,
+  "rmse_kwh": 1.4161260386290708,
+  "mape_percent": 2.903122101724397,
+  "accuracy_percent": 97.09687789827561,
+  "test_days": 140,
+  "baselines": {
+    "persistence": {
+      "mae_kwh": 1.5204642857142856,
+      "rmse_kwh": 1.8961689553262009,
+      "mape_percent": 3.8458747432825535,
+      "accuracy_percent": 96.15412525671745,
+      "test_days": 140
+    },
+    "train_mean": {
+      "mae_kwh": 10.259821428571428,
+      "rmse_kwh": 10.344874166901722,
+      "mape_percent": 26.049293846272587,
+      "accuracy_percent": 73.95070615372741,
+      "test_days": 140
+    }
+  },
+  "sequence_length": 30,
+  "seed": 42,
+  "numpy_max_difference": 5.1703475861808457e-08
+}

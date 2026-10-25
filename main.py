@@ -1,47 +1,59 @@
+"""Run the whole project: data -> preprocessing -> training -> dashboard.
 
-
+    python main.py                  everything
+    python main.py --no-dashboard   stop after training
+    python main.py --regenerate     overwrite data/electricity_data.csv with fresh simulated data
+"""
+import argparse
 import os
+import subprocess
 import sys
 
-print("=" * 60)
-print("⚡  ELECTRICITY CONSUMPTION OPTIMIZER")
-print("    AI-Powered Household Energy Management System")
-print("=" * 60)
+ROOT = os.path.dirname(os.path.abspath(__file__))
+RAW_FILE = os.path.join(ROOT, "data", "electricity_data.csv")
 
 
-print("\n📊 STEP 1: Generating dataset...")
-os.chdir('data')
-os.system('python generate_data.py')
-os.chdir('..')
-print("✅ Dataset ready!")
+def main():
+    parser = argparse.ArgumentParser(description="Electricity Consumption Optimizer")
+    parser.add_argument("--regenerate", action="store_true",
+                        help="recreate the simulated dataset even if a data file exists")
+    parser.add_argument("--no-dashboard", action="store_true",
+                        help="don't launch the Streamlit dashboard at the end")
+    args = parser.parse_args()
 
-print("\n🧹 STEP 2: Preprocessing data...")
-from data_preprocessing import (
-    load_data, clean_data, get_daily_data,
-    detect_anomalies, calculate_bill, prepare_ml_data
-)
+    print("=" * 60)
+    print("ELECTRICITY CONSUMPTION OPTIMIZER")
+    print("=" * 60)
 
-df       = load_data('data/electricity_data.csv')
-df       = clean_data(df)
-daily_df = get_daily_data(df)
-daily_df, anomalies = detect_anomalies(daily_df)
-daily_df['bill'] = daily_df['usage_kwh'].apply(calculate_bill)
-daily_df.to_csv('data/daily_clean.csv', index=False)
-print("✅ Preprocessing complete!")
+    # Step 1: data. An existing file is never overwritten unless asked, so your
+    # own meter data is safe.
+    print("\nSTEP 1: Dataset")
+    if args.regenerate or not os.path.exists(RAW_FILE):
+        subprocess.run([sys.executable, os.path.join(ROOT, "data", "generate_data.py")], check=True)
+    else:
+        print("Using existing data/electricity_data.csv")
+
+    # Step 2: preprocessing
+    print("\nSTEP 2: Preprocessing")
+    from data_preprocessing import run_preprocessing
+    run_preprocessing()
+
+    # Step 3: training
+    print("\nSTEP 3: Training the LSTM (a few minutes on a normal laptop)")
+    try:
+        from train_model import run_training
+    except ImportError as err:
+        sys.exit(f"{err}\nTraining needs TensorFlow: pip install -r requirements-train.txt")
+    run_training()
+
+    # Step 4: dashboard
+    if args.no_dashboard:
+        print("\nDone. Start the dashboard with: streamlit run app/dashboard.py")
+        return
+    print("\nSTEP 4: Launching the dashboard at http://localhost:8501 (Ctrl+C to stop)")
+    subprocess.run([sys.executable, "-m", "streamlit", "run",
+                    os.path.join(ROOT, "app", "dashboard.py")], cwd=ROOT)
 
 
-print("\n🤖 STEP 3: Training LSTM model...")
-print("   (This may take 2-5 minutes...)")
-from train_model import build_model, train_model, evaluate_model
-
-X_train, X_test, y_train, y_test, scaler = prepare_ml_data(daily_df)
-model          = build_model(sequence_length=30)
-model, history = train_model(model, X_train, y_train)
-y_pred, y_test_actual = evaluate_model(model, X_test, y_test, scaler)
-print("✅ Model trained and saved!")
-
-print("\n🚀 STEP 4: Launching dashboard...")
-print("   Opening http://localhost:8501")
-print("   Press Ctrl+C to stop the dashboard")
-print("=" * 60)
-os.system('streamlit run app/dashboard.py')
+if __name__ == "__main__":
+    main()
