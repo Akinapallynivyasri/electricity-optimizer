@@ -1,8 +1,7 @@
 # ⚡ Electricity Consumption Optimizer
 ### Predicting and reducing household energy waste
 
-**Live demo:** _add your Streamlit link here after deploying_
-<!-- Paper reference: add the title / DOI of the published paper here. -->
+   **Live demo:** [electricity-optimizer.streamlit.app](https://electricity-optimizer.streamlit.app)
 
 ---
 
