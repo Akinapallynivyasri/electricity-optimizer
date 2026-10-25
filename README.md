@@ -154,15 +154,6 @@ dashboard stops describing the data as simulated. Extra columns named `current`,
 `frequency` or `run_hours` in `data/daily_clean.csv` are charted automatically; columns that are not
 present are simply not shown.
 
-## Deploy on Streamlit Community Cloud (free)
-
-1. Push this repository to GitHub.
-2. Go to https://share.streamlit.io and sign in with GitHub.
-3. **Create app** → pick the repository, branch `main`, main file path `app/dashboard.py`.
-4. Open **Advanced settings** and choose Python 3.11 or 3.12, then **Deploy**.
-
-Only `requirements.txt` is installed there, so the build is quick.
-
 ## Project structure
 
 ```
